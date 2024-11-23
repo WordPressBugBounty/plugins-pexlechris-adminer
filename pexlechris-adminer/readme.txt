@@ -5,8 +5,8 @@ Plugin Name: Database Management tool - Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 3.0.0
-Stable tag: 3.0.0
+Version: 3.0.1
+Stable tag: 3.0.1
 Adminer version: 4.8.4
 Requires at least: 4.7.0
 Tested up to: 6.7.1
@@ -138,6 +138,9 @@ You can access the WP Adminer from the below positions:
 
 
 == Changelog ==
+ = 3.0.1 =
+* Fixes the bug introduced in version 3.0.0, where a disabled plugin named **pexlechris_adminer_avoid_conflicts_with_other_plugins.php** was displayed in the list of plugins.
+
  = 3.0.0 =
 * New Adminer Version Included: Updated to 4.8.4, forked from the original Adminer 4.8.1 due to lack of maintenance for over two years.
   Learn more about the fork and updates at [AdminerEVO Website](https://docs.adminerevo.org/#history).
