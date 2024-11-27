@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Adminer for WP - The Database Management tool
  * Description: Manage the database from your WordPress Dashboard using Adminer
- * Version: 3.0.2
- * Stable tag: 3.0.2
+ * Version: 3.0.3
+ * Stable tag: 3.0.3
  * Adminer version: 4.8.4
  * Author: Pexle Chris
  * Author URI: https://www.pexlechris.dev
@@ -25,6 +25,17 @@ if ( ! defined( 'ABSPATH' ) ) die;
  */
 define('PEXLECHRIS_ADMINER_DIR', __DIR__);
 
+/**
+ * PEXLECHRIS_ADMINER_MU_PLUGIN_DATA constant
+ *
+ * @since 3.0.0
+ */
+define('PEXLECHRIS_ADMINER_MU_PLUGIN_DATA', [
+	'file'          => 'pexlechris_adminer_avoid_conflicts_with_other_plugins.php',
+	'version'       => '3.0.3',
+	'option_name'   => 'pexlechris_adminer_mu_plugin_version',
+]);
+
 require_once WP_PLUGIN_DIR . '/pexlechris-adminer/pluggable-functions.php';
 
 
@@ -39,17 +50,6 @@ function pexlechris_adminer_add_open_wp_adminer_link_in_plugin_action_links($lin
 }
 
 
-
-/**
- * PEXLECHRIS_ADMINER_MU_PLUGIN_DATA constant
- *
- * @since 3.0.0
- */
-define('PEXLECHRIS_ADMINER_MU_PLUGIN_DATA', [
-	'file'          => 'pexlechris_adminer_avoid_conflicts_with_other_plugins.php',
-    'version'       => '3.0.0',
-	'option_name'   => 'pexlechris_adminer_mu_plugin_version',
-]);
 
 
 /**
