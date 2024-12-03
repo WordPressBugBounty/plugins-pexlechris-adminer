@@ -1,12 +1,12 @@
-=== Database Management tool - Adminer ===
+=== Database Manager - WP Adminer ===
 Contributors: pexlechris
 Donate link: https://www.paypal.com/donate/?hosted_button_id=VDPQY9UE2SQRQ
-Plugin Name: Adminer for WP - The Database Management tool
+Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 3.0.3
-Stable tag: 3.0.3
+Version: 3.0.3.1
+Stable tag: 3.0.3.1
 Adminer version: 4.8.4
 Requires at least: 4.7.0
 Tested up to: 6.7.1
@@ -138,6 +138,9 @@ You can access the WP Adminer from the below positions:
 
 
 == Changelog ==
+ = 3.0.3.1 =
+* New plugin name: **Database Manager - WP Adminer**
+
  = 3.0.3 =
 * Fix bug that produced when the plugin has been deactivated but the relevant MU plugin has not been deleted. Thanks [peopleinside](https://wordpress.org/support/users/peopleinside/) for reporting
 
