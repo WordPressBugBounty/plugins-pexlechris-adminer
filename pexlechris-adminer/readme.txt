@@ -5,8 +5,8 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 3.1.0
-Stable tag: 3.1.0
+Version: 3.1.1
+Stable tag: 3.1.1
 Adminer version: 4.8.4
 Requires at least: 4.7.0
 Tested up to: 6.7.1
@@ -138,8 +138,11 @@ You can access the WP Adminer from the below positions:
 
 
 == Changelog ==
+ = 3.1.1 =
+* Bug Fix: Resolved an issue where the feature for passing the WordPress user's language setting (locale) to WP Adminer was not working correctly.
+
  = 3.1.0 =
-* Enhancement: The plugin now sends the user's language setting (locale) to WP Adminer, but only if Adminer supports that language. Hook introduced: `pexlechris_adminer_locale`
+* Enhancement: The plugin now sends the WordPress user's language setting (locale) to WP Adminer, but only if Adminer supports that language. Hook introduced: `pexlechris_adminer_locale`
 
  = 3.0.3.1 =
 * New plugin name: **Database Manager - WP Adminer**

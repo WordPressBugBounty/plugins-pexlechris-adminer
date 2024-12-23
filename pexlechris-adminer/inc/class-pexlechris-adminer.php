@@ -5,7 +5,7 @@ class Pexlechris_Adminer extends Adminer {
     public function get_wp_locale()
 	{
 		$wp_user_locale = get_user_locale();
-        $expl = explode('_', $wp_user_locale)[0];
+        $expl = explode('_', $wp_user_locale);
 		$adminer_locale = $expl[0];
 
 		/**
