@@ -47,6 +47,7 @@ if( !function_exists('pexlechris_adminer_access_capabilities') ) {
 		}
 
 		$capabilities = apply_filters('pexlechris_adminer_access_capabilities', $capabilities);
+		$capabilities = (array)( $capabilities ?: [] );
 		return $capabilities;
 	}
 }
@@ -56,7 +57,9 @@ if( !function_exists('have_current_user_access_to_pexlechris_adminer') ){
 	{
 		foreach (pexlechris_adminer_access_capabilities() as $capability) {
 			require_once ABSPATH . WPINC . '/pluggable.php';
-			if( current_user_can($capability) ) return true;
+			if( defined('SECURE_AUTH_COOKIE') && current_user_can($capability) ){
+				return true;
+			}
 		}
 
 		return false;

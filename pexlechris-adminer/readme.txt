@@ -5,12 +5,12 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 3.1.1
-Stable tag: 3.1.1
+Version: 3.1.2
+Stable tag: 3.1.2
 Adminer version: 4.8.4
 Requires at least: 4.7.0
-Tested up to: 6.7.1
-Requires PHP: 5.6
+Tested up to: 6.7.2
+Requires PHP: 7.0
 Tested up to PHP: 8.2
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -138,6 +138,12 @@ You can access the WP Adminer from the below positions:
 
 
 == Changelog ==
+= 3.1.2 =
+* Tested up to WP 6.7.2
+* Now Requires PHP 7.0
+* [New]: The `pexlechris_adminer_access_capabilities` filter can now return the capability as a string. Returning an array with the capability is no longer required.
+* [Bug Fix]: In some cases, when the WP Adminer's must-use plugin is executed, the SECURE_AUTH_COOKIE cookie is not set, causing a fatal error when accessing WP Adminer. Now fixed!
+
  = 3.1.1 =
 * Bug Fix: Resolved an issue where the feature for passing the WordPress user's language setting (locale) to WP Adminer was not working correctly.
 
