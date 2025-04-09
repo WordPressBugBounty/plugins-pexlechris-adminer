@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Database Manager - WP Adminer
  * Description: Manage the database from your WordPress Dashboard using Adminer.
- * Version: 3.1.2
- * Stable tag: 3.1.2
+ * Version: 4.0.0
+ * Stable tag: 4.0.0
  * Adminer version: 4.8.4
  * Author: Pexle Chris
  * Author URI: https://www.pexlechris.dev
@@ -32,7 +32,7 @@ define('PEXLECHRIS_ADMINER_DIR', __DIR__);
  */
 define('PEXLECHRIS_ADMINER_MU_PLUGIN_DATA', [
 	'file'          => 'pexlechris_adminer_avoid_conflicts_with_other_plugins.php',
-	'version'       => '3.0.3',
+	'version'       => '4.0.0',
 	'option_name'   => 'pexlechris_adminer_mu_plugin_version',
 ]);
 
@@ -64,11 +64,11 @@ function pexlechris_adminer_copy_adminer_mu_plugin() {
     $option = get_option( $option_name, null );
 
     if( $option === null) {
-		// continue to updating mu plugin
+		// continue to creating mu plugin
 	}elseif( empty($option) ){ // 0 or empty string
 		return;
     }elseif( version_compare( $version, $option ) > 0 ){
-		// continue to updating mu plugin
+		// continue to creating mu plugin
 	}else{
 		return;
 	}
@@ -102,7 +102,11 @@ function pexlechris_adminer_delete_adminer_mu_plugin()
 	if (file_exists($mu_plugin)) {
 		unlink($mu_plugin);
 	}
-	delete_option($option_name);
+
+    // not delete empty option, save this choice for later when you re-activate WP Adminer
+    if( get_option($option_name) ){
+		delete_option($option_name);
+	}
 }
 
 add_action( 'plugins_loaded', 'pexlechris_maybe_set_wp_admin_constant', 1 );
@@ -157,15 +161,38 @@ add_action('admin_bar_menu', 'pexlechris_adminer_register_in_wp_admin_bar' , 50)
 function pexlechris_adminer_register_in_wp_admin_bar($wp_admin_bar) {
 
 	if( have_current_user_access_to_pexlechris_adminer() ){
+
+        global $wpdb;
+
 		$args = array(
-			'id' => 'wp_adminer',
+			'id'    => 'wp_adminer',
 			'title' => esc_html__('WP Adminer', 'pexlechris-adminer'),
-			'href' => esc_url(site_url() . '/' . PEXLECHRIS_ADMINER_SLUG),
-			"meta" => array(
-				"target" => "_blank"
-			)
+			'href'  => esc_url( get_pexlechris_adminer_url() ),
+			'meta'  => [
+				'target' => '_blank'
+			]
 		);
 		$wp_admin_bar->add_node($args);
+
+        foreach(pexlechris_adminer_admin_bar_dropdown_items() as $table)
+        {
+			$name  = $table['name'];
+			$label = $table['label'];
+			$args  = $table['args'] ?? [];
+
+            $table_name = $wpdb->$name ?? $wpdb->prefix . $name;
+
+			$wp_admin_bar->add_node([
+				'id'        => 'wp_adminer_' . $name . ($args ? '_with_args' : ''),
+				'title'     => $label,
+				'parent'    => 'wp_adminer',
+				'href'      => esc_url( get_pexlechris_adminer_url($table_name, $args) ),
+				'meta'      => [
+					'target' => '_blank'
+				]
+			]);
+		}
+
 	}
 
 }
@@ -203,11 +230,11 @@ function pexlechris_adminer_before_adminer_loads()
 {
 	if( !defined('PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB') || true === PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB ){
 		if( !isset($_GET['db']) && isset($_GET['username']) && '' == $_GET['username'] ){
-			// show wordpress database
-			wp_redirect( $_SERVER["REQUEST_URI"] . '&db=' . DB_NAME);
+			// show WordPress database
+			wp_redirect( $_SERVER['REQUEST_URI'] . '&db=' . DB_NAME);
 			exit;
 		}elseif( isset($_GET['db']) && DB_NAME != $_GET['db'] ){
-			// if try to show another of wordpress database, wp_die
+			// if try to show another of WordPress database, wp_die
 			wp_die(
 				esc_html__("You haven't access to any database other than the site's database. In order to enable access, you need to add the following line code in the wp-config.php file", 'pexlechris-adminer') .
 				"<pre>define('PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB', false);</pre>"
@@ -231,4 +258,221 @@ function pexlechris_adminer_disable_display_errors_before_adminer_loads()
 	 * @since 3.0.0
 	 */
 	add_filter( 'doing_it_wrong_trigger_error', '__return_false' );
+}
+
+/**
+ * @since 4.0.0
+ *
+ * @param string $table The DB Table.
+ * @param array $args Function args
+ *
+ * @return string $table_url
+ */
+function get_pexlechris_adminer_url( $table = null, $args = [] )
+{
+    $get_parameters = [];
+
+    if( $table ){
+		$get_parameters = [
+			'db'        => DB_NAME,
+            'select'    => $table,
+		];
+    }
+
+	$get_parameters = array_merge($get_parameters, $args);
+
+    $str = '';
+    foreach($get_parameters as $get_key => $get_value){
+        $str .= '&' . $get_key . '=' . $get_value;
+    }
+
+    $table_url = home_url() . '/' . PEXLECHRIS_ADMINER_SLUG . '?username' . $str;
+
+	/**
+     * Filter to alter generated adminer URL
+     *
+	 * @since 2.3.0
+     *
+     * @param string $table_url
+     * @param string $table The DB Table.
+     * @param array $args Function args
+	 */
+	$table_url = apply_filters('pexlechris_adminer_url', $table_url, $get_parameters, $table, $args);
+
+	return $table_url;
+
+}
+
+function pexlechris_adminer_admin_bar_dropdown_items()
+{
+    global $pagenow;
+
+	$post_id = null;
+	if( is_admin() ){
+		$post_id = $_GET['post'] ?? null;
+	}elseif( ($object = get_queried_object()) instanceof WP_Post ){
+		$post_id = $object->ID;
+	}
+
+	$user_id = null;
+	if( $pagenow == 'profile.php' ){
+		$user_id = get_current_user_id();
+	}elseif( $pagenow == 'user-edit.php' ){
+	    $user_id = $_GET['user_id'] ?? null;
+    }elseif( !is_admin() && ($object = get_queried_object()) instanceof WP_User ){
+		$user_id = $object->ID;
+	}
+
+    // Woocommerce HPOS orders integrate
+    $is_hpos_enabled = false;
+	if ( class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil') && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled() ) {
+	    $is_hpos_enabled = true;
+	}
+
+	// integrate with variable-inspector plugin by Bowo
+	$is_variable_inspector_enabled = is_plugin_active( 'variable-inspector/variable-inspector.php' );
+
+    if($is_hpos_enabled){
+
+		$hpos_order_id = ($_GET['page'] ?? null) === 'wc-orders'
+            ? $_GET['id']
+            : null;
+
+
+		$dropdown_items[] = [
+			'name'  => 'wc_orders',
+			'label' => __('Orders Table', 'pexlechris-adminer'),
+		];
+
+		if($hpos_order_id){
+			$dropdown_items[] = [
+				'name'  => 'wc_orders',
+				'label' => __('-> Current Order', 'pexlechris-adminer'),
+				'args'  => [
+					'where%5B0%5D%5Bcol%5D' => 'id',
+					'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+					'where%5B0%5D%5Bval%5D' => $hpos_order_id,
+				]
+			];
+		}
+
+		$dropdown_items[] = [
+			'name'  => 'wc_orders_meta',
+			'label' => __('Orders meta Table', 'pexlechris-adminer'),
+		];
+
+		if($hpos_order_id){
+			$dropdown_items[] = [
+				'name'  => 'wc_orders_meta',
+				'label' => __('-> Current Orders meta', 'pexlechris-adminer'),
+				'args'  => [
+					'where%5B0%5D%5Bcol%5D' => 'order_id',
+					'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+					'where%5B0%5D%5Bval%5D' => $hpos_order_id,
+					'limit'                 => '1000'
+				]
+			];
+		}
+
+    }
+
+
+	$dropdown_items[] = [
+		'name'  => 'posts',
+		'label' => __('Posts Table', 'pexlechris-adminer'),
+	];
+
+	if($post_id){
+		$dropdown_items[] = [
+			'name'  => 'posts',
+			'label' => __('-> Current Post', 'pexlechris-adminer'),
+			'args'  => [
+				'where%5B0%5D%5Bcol%5D' => 'ID',
+				'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+				'where%5B0%5D%5Bval%5D' => $post_id,
+			]
+		];
+	}
+
+	$dropdown_items[] = [
+		'name'  => 'postmeta',
+		'label' => __('Postmeta Table', 'pexlechris-adminer'),
+	];
+
+	if($post_id){
+		$dropdown_items[] = [
+			'name'  => 'postmeta',
+			'label' => __('-> Current Postmeta', 'pexlechris-adminer'),
+			'args'  => [
+				'where%5B0%5D%5Bcol%5D' => 'post_id',
+				'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+				'where%5B0%5D%5Bval%5D' => $post_id,
+				'limit'                 => '1000'
+			]
+		];
+	}
+
+	$dropdown_items[] = [
+		'name'  => 'options',
+		'label' => __('Options Table', 'pexlechris-adminer'),
+	];
+
+	$dropdown_items[] = [
+		'name'  => 'users',
+		'label' => __('Users Table', 'pexlechris-adminer'),
+	];
+
+	if($user_id){
+		$dropdown_items[] = [
+			'name'  => 'users',
+			'label' => __('-> Current User', 'pexlechris-adminer'),
+			'args'  => [
+				'where%5B0%5D%5Bcol%5D' => 'ID',
+				'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+				'where%5B0%5D%5Bval%5D' => $user_id,
+				'limit'                 => '1000'
+			]
+		];
+	}
+
+	$dropdown_items[] = [
+		'name'  => 'usermeta',
+		'label' => __('Usermeta Table', 'pexlechris-adminer'),
+	];
+
+	if($user_id){
+		$dropdown_items[] = [
+			'name'  => 'usermeta',
+			'label' => __('-> Current Usermeta', 'pexlechris-adminer'),
+			'args'  => [
+				'where%5B0%5D%5Bcol%5D' => 'user_id',
+				'where%5B0%5D%5Bop%5D'  => '%3D', // op = '='
+				'where%5B0%5D%5Bval%5D' => $user_id,
+				'limit'                 => '1000'
+			]
+		];
+	}
+
+	if ($is_variable_inspector_enabled) {
+		$dropdown_items[] = [
+			'name'  => 'variable_inspector',
+			'label' => __('Variable Inspector Table', 'pexlechris-adminer'),
+		];
+    }
+
+
+	/**
+	 * The dropdown items.
+     *
+     * @param array $dropdown_items{
+     *      @type string $name. The table name.
+     *      @type string $label. The label of the dropdown item.
+     *      @type array $args. The array of extra url parameters. Parameters will not be encoded.
+     *                         Developers could avoid defining args in the array.
+     * }
+	 */
+	$dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $dropdown_items);
+
+    return $dropdown_items;
+
 }

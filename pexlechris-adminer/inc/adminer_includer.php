@@ -32,5 +32,15 @@ if ( !function_exists('adminer_object') ) {
 
 }
 
+/**
+ * @since 4.0.0
+ * @deprecated 4.0.0
+ * @return mixed|string
+ */
+function get_nonce(){
+	_deprecated_function( 'get_nonce()', 'WP Adminer 4.0.0', '\Adminer\get_nonce()' );
+	return \Adminer\get_nonce();
+}
+
 // include original Adminer
 include 'adminer.php';

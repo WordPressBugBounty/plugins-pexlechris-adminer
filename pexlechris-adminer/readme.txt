@@ -1,13 +1,12 @@
 === Database Manager - WP Adminer ===
 Contributors: pexlechris
-Donate link: https://www.paypal.com/donate/?hosted_button_id=VDPQY9UE2SQRQ
 Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 3.1.2
-Stable tag: 3.1.2
-Adminer version: 4.8.4
+Version: 4.0.0
+Stable tag: 4.0.0
+Adminer version: 5.1.1
 Requires at least: 4.7.0
 Tested up to: 6.7.2
 Requires PHP: 7.0
@@ -21,18 +20,14 @@ Manage the database from your WordPress Dashboard using Adminer.
 
 The best database management tool for the best CMS.
 
-This plugin uses the tool [AdminerEVO 4.8.4](https://docs.adminerevo.org/), fork of [Adminer 4.8.1](https://www.adminer.org/), in order to give database access to administrators directly from the Dashboard.
+This plugin uses the tool [Adminer 5.1.1](https://www.adminer.org/), in order to give database access to administrators directly from the Dashboard.
 As simple as the previous sentence!
+
+I am not the author of Adminer. I am only the author who does the WordPress integration with Adminer.
+Author of Adminer is Jakub Vrana and you can donate him from [there](https://www.paypal.com/donate/?item_name=Donation+to+Adminer&cmd=_donations&business=jakub%40vrana.cz)
 
 Compatible also with WordPress Multisite installations
 
-== About the fork ==
-AdminerEVO Author's Statement:
-The original Adminer was created and maintained by Jakub Vrána in the vrana/adminer repository.
-Not being maintained for more than two years and being a daily user of Adminer,
-I've tried to get in touch with the original developer to propose my help to continue the project, but without success, I got no answer.
-I have then started to search if someone would be interested in continuing the project with me and found someone who seemed to have the same interest and view on the future of this project.
-I am now starting to take over the project under a slightly different name and will try to keep compatibility with all current database engines but also to give Adminer a new features, layout, etc.
 
 == WP Adminer access positions ==
 You can access the WP Adminer from the below positions:
@@ -47,6 +42,7 @@ You can access the WP Adminer from the below positions:
 == Screenshots ==
 
 1. The WP Adminer opened from Admin Bar
+2. The new dropdown admin_bar items
 
 == Frequently Asked Questions ==
 
@@ -54,7 +50,7 @@ You can access the WP Adminer from the below positions:
  Yes, because only administrators have access to WP Adminer. If a guest tries to access the WP Adminer URL, a 404 page will be shown up.
 
 
- = Who have access in WP Adminer? =
+ = Who has access to WP Adminer? =
 &nbsp;
 
  * In the case of single site WordPress installations, only Administrators have access in WP Adminer, because by default only administrator have the `manage_options` capability.
@@ -77,8 +73,12 @@ You can access the WP Adminer from the below positions:
  You need to use action `pexlechris_adminer_head` as follows:
  `
  add_action('pexlechris_adminer_head', function(){
+    // Use the appropriate get_nonce() function based on your WP Adminer version
+    $nonce = function_exists('Adminer\get_nonce')
+        ? Adminer\get_nonce() // For WP Adminer v4.0.0 and newer
+        : get_nonce(); // For WP Adminer versions below 4.0.0
     ?>
-    <script nonce="<?php echo esc_attr( get_nonce() )?>"> // get_nonce is an adminer function
+    <script nonce="<?php echo esc_attr( $nonce )?>"> // get_nonce is an adminer function
        // Place your JS code here
     </script>
     <style>
@@ -86,6 +86,23 @@ You can access the WP Adminer from the below positions:
     </style>
     <?php
  });
+ `
+
+ = How can I change the WP Adminer children items at the admin bar? =
+ You can do this using WP filter: `pexlechris_adminer_adminbar_dropdown_items`.
+ Filter's PHPDoc:
+ `
+/**
+ * The dropdown items.
+ *
+ * @param array $dropdown_items{
+ *      @type string $name. The table name.
+ *      @type string $label. The label of the dropdown item.
+ *      @type array $args. The array of extra url parameters. Parameters will not be encoded.
+ *                         Developers could avoid defining args in the array
+ * }
+ */
+$dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $dropdown_items);
  `
 
 
@@ -138,6 +155,26 @@ You can access the WP Adminer from the below positions:
 
 
 == Changelog ==
+= 4.0.0 =
+* ⚠️ Important for Developers:
+  **Adminer 5.1.1** now loads under the `Adminer` namespace.
+  If you’ve made any customizations to the plugin, please read carefully:
+  > The main class is now `Adminer\Adminer`.
+  > If you're extending my class `Pexlechris_Adminer`, everything will continue to work fine!
+  > However, if you’ve used `get_nonce()` to include custom JavaScript, you **must** update it to `Adminer\get_nonce()`.
+    For more details, check the FAQ: “**How to add my own JS and/or CSS in Adminer head?**”
+* [New]: New Adminer version 5.1.1! Update from original [Adminer](https://www.adminer.org/en/).
+  The previously used AdminerEVO fork is no longer maintained and has been discontinued. It has now been replaced with the default Adminer (v5.1.1).
+* [New]: New function `get_pexlechris_adminer_url()`. Can be filtered by new below hook:
+* [New]: New filter `pexlechris_adminer_url` that change the returned value of function `get_pexlechris_adminer_url()`.
+* [New]: New dropdown choices under WP Adminer admin topbar URL. Can be filtered by bellow hook:
+* [New]: New filter `pexlechris_adminer_adminbar_dropdown_items` in order to change the dropdown items.
+* [Enhancement]: More user-friendly mobile UI.
+* [Enhancement]: Adminer UI customizations, select links at the left sidebar are back as icons.
+* [Enhancement]: Admin topbar URL via function `get_pexlechris_adminer_url()`. Can be filtered by new hook `pexlechris_adminer_url`.
+* [Enhancement]: The plugin now respects the `pexlechris_adminer_mu_plugin_version` option even after plugin deactivation. If a developer sets this value to `0` or an empty string, the must-use plugin will no longer be automatically created or updated — including during deactivation, which was previously not prevented.
+* [Enhancement]: Translation pot file updated with new strings.
+
 = 3.1.2 =
 * Tested up to WP 6.7.2
 * Now Requires PHP 7.0

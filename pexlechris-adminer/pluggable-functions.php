@@ -57,7 +57,7 @@ if( !function_exists('have_current_user_access_to_pexlechris_adminer') ){
 	{
 		foreach (pexlechris_adminer_access_capabilities() as $capability) {
 			require_once ABSPATH . WPINC . '/pluggable.php';
-			if( defined('SECURE_AUTH_COOKIE') && current_user_can($capability) ){
+			if( current_user_can($capability) ){
 				return true;
 			}
 		}
