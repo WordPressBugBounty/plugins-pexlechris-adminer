@@ -4,7 +4,7 @@
  * Description: This mu plugin disables on the fly all other plugins to avoid conflicts.
  * 				Version is controlled by option pexlechris_adminer_mu_plugin_version.
  * 				Delete option to reinstall, or set option to 0 to ignore version updates forever
- *  Version: 4.0.0
+ *  Version: 4.0.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -73,7 +73,7 @@ function pexlechris_adminer_only_this_plugin_active()
 		}
 
 		$logged_in_cookie = array_filter($_COOKIE, function ($k) {
-			return strpos($k, 'wordpress_logged_in_') !== false;
+			return strpos($k, 'wordpress_logged_in_') === 0;
 		}, ARRAY_FILTER_USE_KEY);
 
 		if (empty($logged_in_cookie)) {

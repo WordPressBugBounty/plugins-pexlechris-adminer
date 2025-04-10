@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Database Manager - WP Adminer
  * Description: Manage the database from your WordPress Dashboard using Adminer.
- * Version: 4.0.0
- * Stable tag: 4.0.0
- * Adminer version: 4.8.4
+ * Version: 4.0.1
+ * Stable tag: 4.0.1
+ * Adminer version: 5.2.0
  * Author: Pexle Chris
  * Author URI: https://www.pexlechris.dev
  * Contributors: pexlechris
@@ -32,7 +32,7 @@ define('PEXLECHRIS_ADMINER_DIR', __DIR__);
  */
 define('PEXLECHRIS_ADMINER_MU_PLUGIN_DATA', [
 	'file'          => 'pexlechris_adminer_avoid_conflicts_with_other_plugins.php',
-	'version'       => '4.0.0',
+	'version'       => '4.0.1',
 	'option_name'   => 'pexlechris_adminer_mu_plugin_version',
 ]);
 
@@ -42,8 +42,8 @@ require_once WP_PLUGIN_DIR . '/pexlechris-adminer/pluggable-functions.php';
 add_filter('plugin_action_links_pexlechris-adminer/pexlechris-adminer.php', 'pexlechris_adminer_add_open_wp_adminer_link_in_plugin_action_links', 15, 2);
 function pexlechris_adminer_add_open_wp_adminer_link_in_plugin_action_links($links)
 {
-    $url = esc_url(site_url() . '/' . PEXLECHRIS_ADMINER_SLUG);
-    $anchor = '<a href="' . $url . '" target="_blank">' . __('Open WP Adminer', 'pexlechris-adminer') . '</a>';
+    $url = get_pexlechris_adminer_url();
+    $anchor = '<a href="' . esc_url($url) . '" target="_blank">' . __('Open WP Adminer', 'pexlechris-adminer') . '</a>';
     $new = [$anchor];
 
     return array_merge($new, $links);
@@ -217,7 +217,7 @@ if( !function_exists('pexlechris_adminer_tools_page_content') ){
 	function pexlechris_adminer_tools_page_content(){
 		?>
 		<br>
-		<a href="<?php echo esc_url( site_url() . '/' . PEXLECHRIS_ADMINER_SLUG )?>" class="button-primary pexlechris-adminer-tools-page-button" target="_blank">
+		<a href="<?php echo esc_url( get_pexlechris_adminer_url() ); ?>" class="button-primary pexlechris-adminer-tools-page-button" target="_blank">
 			<?php esc_html_e('Open Adminer in a new tab', 'pexlechris-adminer');?>
         </a>
 		<?php
@@ -330,6 +330,7 @@ function pexlechris_adminer_admin_bar_dropdown_items()
 	}
 
 	// integrate with variable-inspector plugin by Bowo
+	require_once ABSPATH . 'wp-admin/includes/plugin.php'; // includes function is_plugin_active
 	$is_variable_inspector_enabled = is_plugin_active( 'variable-inspector/variable-inspector.php' );
 
     if($is_hpos_enabled){

@@ -4,9 +4,9 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.0.0
-Stable tag: 4.0.0
-Adminer version: 5.1.1
+Version: 4.0.1
+Stable tag: 4.0.1
+Adminer version: 5.2.0
 Requires at least: 4.7.0
 Tested up to: 6.7.2
 Requires PHP: 7.0
@@ -20,11 +20,11 @@ Manage the database from your WordPress Dashboard using Adminer.
 
 The best database management tool for the best CMS.
 
-This plugin uses the tool [Adminer 5.1.1](https://www.adminer.org/), in order to give database access to administrators directly from the Dashboard.
+This plugin uses the tool [Adminer](https://www.adminer.org/), in order to give database access to administrators directly from the Dashboard.
 As simple as the previous sentence!
 
 I am not the author of Adminer. I am only the author who does the WordPress integration with Adminer.
-Author of Adminer is Jakub Vrana and you can donate him from [there](https://www.paypal.com/donate/?item_name=Donation+to+Adminer&cmd=_donations&business=jakub%40vrana.cz)
+Author of Adminer is Jakub Vrana and you can donate him from [there](https://www.paypal.com/donate/?item_name=Donation+to+Adminer&cmd=_donations&business=jakub%40vrana.cz).
 
 Compatible also with WordPress Multisite installations
 
@@ -155,6 +155,11 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+= 4.0.1 =
+* [New]: Update Adminer version to 5.2.0
+* [Enhancement]: Now login form class `pexle_loginForm` is added by new method Pexlechris_Adminer::loginForm()
+* [Bug Fix]: In some cases, users with access to WP Adminer (e.g., administrators) would encounter a fatal error when viewing the frontend while the admin bar was loaded.
+
 = 4.0.0 =
 * ⚠️ Important for Developers:
   **Adminer 5.1.1** now loads under the `Adminer` namespace.

@@ -26,6 +26,18 @@ class Pexlechris_Adminer extends Adminer\Adminer {
 		return true; // login even if password is empty string
 	}
 
+    function loginForm(){
+        ob_start();
+        parent::loginForm();
+        $form_html = ob_get_clean();
+        $form_html = str_replace(
+            "<table class='layout'>",
+            "<table class='layout pexle_loginForm'>",
+            $form_html
+        );
+        echo $form_html;
+    }
+
     function head($Ib = null){
         $this->pexlechris_adminer_head();
 		/**
@@ -99,7 +111,7 @@ class Pexlechris_Adminer extends Adminer\Adminer {
                 background-position: center 0;
                 background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>');
             }
-            #tables li:has(.active){
+            #tables a.active + a{
                 font-weight: bold;
             }
             /* UI Customizations - END */
