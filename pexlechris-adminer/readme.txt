@@ -4,8 +4,8 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.0.1
-Stable tag: 4.0.1
+Version: 4.0.2
+Stable tag: 4.0.2
 Adminer version: 5.2.0
 Requires at least: 4.7.0
 Tested up to: 6.7.2
@@ -155,6 +155,9 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+= 4.0.2 =
+* Bug fix introduced in Adminer 5.2.0 when selecting (exact equal) a value.
+
 = 4.0.1 =
 * [New]: Update Adminer version to 5.2.0
 * [Enhancement]: Now login form class `pexle_loginForm` is added by new method Pexlechris_Adminer::loginForm()
