@@ -4,11 +4,11 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.0.2
-Stable tag: 4.0.2
+Version: 4.0.3
+Stable tag: 4.0.3
 Adminer version: 5.2.0
 Requires at least: 4.7.0
-Tested up to: 6.7.2
+Tested up to: 6.8
 Requires PHP: 7.0
 Tested up to PHP: 8.2
 License: GPLv2
@@ -155,6 +155,10 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+= 4.0.3 =
+* Tested up to WP 6.8
+* [Bug fix]: WP Adminer home URL structure updated — a `=` is now correctly added after the username parameter (e.g., https://example.com/wp-adminer?username=).
+
 = 4.0.2 =
 * Bug fix introduced in Adminer 5.2.0 when selecting (exact equal) a value.
 

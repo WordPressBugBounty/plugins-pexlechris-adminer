@@ -2,15 +2,15 @@
 /**
  * Plugin Name: Database Manager - WP Adminer
  * Description: Manage the database from your WordPress Dashboard using Adminer.
- * Version: 4.0.2
- * Stable tag: 4.0.2
+ * Version: 4.0.3
+ * Stable tag: 4.0.3
  * Adminer version: 5.2.0
  * Author: Pexle Chris
  * Author URI: https://www.pexlechris.dev
  * Contributors: pexlechris
  * Domain Path: /languages
  * Requires at least: 4.7.0
- * Tested up to: 6.7.2
+ * Tested up to: 6.8
  * Requires PHP: 7.0
  * Tested up to PHP: 8.2
  * License: GPLv2
@@ -286,7 +286,7 @@ function get_pexlechris_adminer_url( $table = null, $args = [] )
         $str .= '&' . $get_key . '=' . $get_value;
     }
 
-    $table_url = home_url() . '/' . PEXLECHRIS_ADMINER_SLUG . '?username' . $str;
+    $table_url = home_url() . '/' . PEXLECHRIS_ADMINER_SLUG . '?username=' . $str;
 
 	/**
      * Filter to alter generated adminer URL
