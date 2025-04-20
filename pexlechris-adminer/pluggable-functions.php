@@ -1,7 +1,5 @@
 <?php
 
-
-
 /**
  * To allow this to be overridden in a must-use plugin
  */

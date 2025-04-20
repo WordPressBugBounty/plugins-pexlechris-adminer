@@ -4,8 +4,8 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.0.3
-Stable tag: 4.0.3
+Version: 4.0.4
+Stable tag: 4.0.4
 Adminer version: 5.2.0
 Requires at least: 4.7.0
 Tested up to: 6.8
@@ -155,6 +155,10 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+= 4.0.4 =
+* [Enhancement]: Better UI to help error reporting when Database login failed.
+* [Bug Fix]: Fix `No such file or directory` login error when DB_HOST has been defined with the default MySql/MariaDB port 3306.
+
 = 4.0.3 =
 * Tested up to WP 6.8
 * [Bug fix]: WP Adminer home URL structure updated — a `=` is now correctly added after the username parameter (e.g., https://example.com/wp-adminer?username=).

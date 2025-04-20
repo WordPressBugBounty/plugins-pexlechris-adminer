@@ -19,7 +19,8 @@ class Pexlechris_Adminer extends Adminer\Adminer {
 
 	function credentials() {
 		// server, username and password for connecting to database
-		return array(DB_HOST, DB_USER, DB_PASSWORD);
+        $DB_HOST = DB_HOST === 'localhost:3306' ? 'localhost' : DB_HOST;
+		return array($DB_HOST, DB_USER, DB_PASSWORD);
 	}
 
 	function login($login, $password) {
@@ -59,6 +60,8 @@ class Pexlechris_Adminer extends Adminer\Adminer {
 
                 if ( null === document.querySelector('.pexle_loginForm') ) return;
 
+                // Do following only in login screen
+
                 var wpLocale = '<?php echo $this->get_wp_locale(); ?>';
 
                 var langExists = !!document.querySelector( '#lang option[value="' + wpLocale + '"]' );
@@ -68,6 +71,9 @@ class Pexlechris_Adminer extends Adminer\Adminer {
                     selectElement.value = wpLocale;
                     var event = new Event('change', { bubbles: true });
                     selectElement.dispatchEvent(event);
+
+                }else if( document.querySelector('.error') ) {
+                    document.querySelector('.pexle_loginForm').classList.add('pexle_hide_form');
 
                 }else{
                     document.querySelector('.pexle_loginForm + p > input').click();
@@ -125,7 +131,7 @@ class Pexlechris_Adminer extends Adminer\Adminer {
             p.logout {
                 display: none;
             }
-            .pexle_loginForm::before {
+            .pexle_loginForm:not(.pexle_hide_form)::before {
                 content: "<?php esc_html_e('You are connecting to the database...', 'pexlechris-adminer'); ?>";
             }
 
