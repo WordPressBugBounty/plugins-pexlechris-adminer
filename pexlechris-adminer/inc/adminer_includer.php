@@ -4,14 +4,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die;
 }
 /**
- * adminer_object can be overridden, in WP action pexlechris_adminer_before_adminer_loads.
- * If a developer want to make his/her own changes (adding plugins, extensions or customizations),
+ * adminer_object can be overridden, in WP action pexlechris_adminer_before_adminer_loads in a must-use plugin.
+ * If a developer wants to make his/her own changes (adding plugins, extensions or customizations),
  * it is strongly recommended to include_once the class Pexlechris_Adminer and extend it and
- * make adminer_object function return his/her new class.
+ * force adminer_object function returns his/her new custom class.
  *
  * It is strongly recommended, because Pexlechris_Adminer class contains WordPress/Adminer integration (auto login with WordPress credentials)
  *
- * If a developer want to add just JS and/or CSS in head, he/she can just use the action pexlechris_adminer_head.
+ * If a developer wants to add just JS and/or CSS in head, he/she can just use the action pexlechris_adminer_head.
  * See plugin's FAQs, for more.
  *
  * @since 2.1.0
@@ -33,6 +33,8 @@ if ( !function_exists('adminer_object') ) {
 }
 
 /**
+ * This function introduced for backward compatibility. Please use \Adminer\get_nonce() instead.
+ *
  * @since 4.0.0
  * @deprecated 4.0.0
  * @return mixed|string

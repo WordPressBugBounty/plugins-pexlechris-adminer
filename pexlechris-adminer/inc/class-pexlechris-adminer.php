@@ -1,22 +1,6 @@
 <?php
-class Pexlechris_Adminer extends Adminer\Adminer {
-
-    public function get_wp_locale()
-	{
-		$wp_user_locale = get_user_locale();
-        $expl = explode('_', $wp_user_locale);
-		$adminer_locale = $expl[0];
-
-		/**
-         * Filter the locale of Adminer UI.
-         *
-		 * @since 3.1.0
-         *
-         * @param string $adminer_locale
-		 */
-        return apply_filters('pexlechris_adminer_locale', $adminer_locale);
-	}
-
+class Pexlechris_Adminer extends Adminer\Adminer
+{
 	function credentials() {
 		// server, username and password for connecting to database
         $DB_HOST = DB_HOST === 'localhost:3306' ? 'localhost' : DB_HOST;
@@ -39,21 +23,158 @@ class Pexlechris_Adminer extends Adminer\Adminer {
         echo $form_html;
     }
 
-    function head($Ib = null){
-        $this->pexlechris_adminer_head();
+    function head($Jb = null){
+
+        // Required scripts & styles
+		$this->print_pexlechris_adminer_required_script();
+		$this->print_pexlechris_adminer_required_style();
+		if ( !defined('PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB') || true === PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB ){
+			$this->print_only_one_db_style();
+		}
+
+        // Mandatory scripts & styles
+		$this->print_dark_mode_switcher_script();
+		$this->print_pexlechris_adminer_ui_customizations_style();
+
 		/**
-		 * If a developer want to add just JS and/or CSS in head, he/she can just use the action pexlechris_adminer_head.
+		 * Action to allow developers to add JS and/or CSS in Adminer <head>.
 		 * See plugin's FAQs, for more.
+		 *
+         * @since 2.0.0 Action introduced.
 		 */
 		do_action('pexlechris_adminer_head');
 		return true;
     }
 
-	function pexlechris_adminer_head()
+	function navigation($missing) {
+		parent::navigation($missing);
+		$this->print_dark_mode_switcher();
+	}
+
+	public function get_wp_locale()
+	{
+		$wp_user_locale = get_user_locale();
+		$expl = explode('_', $wp_user_locale);
+		$adminer_locale = $expl[0];
+
+		/**
+		 * Filter the locale of Adminer UI.
+		 *
+		 * @since 3.1.0
+		 *
+		 * @param string $adminer_locale
+		 */
+		return apply_filters('pexlechris_adminer_locale', $adminer_locale);
+	}
+
+	public function print_dark_mode_switcher()
+	{
+		echo "<big style='position: fixed; bottom: .5em; right: .5em; cursor: pointer;'>☀</big>"
+			. Adminer\script("qsl('big').onclick = adminerDarkSwitch;") . "\n";
+	}
+
+	/**
+	 * @since 4.1.0
+	 * @return void
+	 */
+	public function print_dark_mode_switcher_script()
 	{
 		?>
-		<script nonce="<?php echo esc_attr( Adminer\get_nonce() )?>">
-            verifyVersion = function () {}; // Disable version checker
+        <script nonce="<?php echo esc_attr( Adminer\get_nonce() )?>">
+            let adminerDark;
+
+            const saved = document.cookie.match(/adminer_dark=(\d)/);
+            if (saved) {
+                adminerDark = +saved[1];
+                adminerDarkSet();
+            }else{
+                adminerDark = +window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.querySelector('html').setAttribute('data-dark-mode', adminerDark);
+            }
+
+
+            function adminerDarkSwitch() {
+                adminerDark = !adminerDark;
+                adminerDarkSet();
+            }
+
+            function adminerDarkSet() {
+                qsa('link[href*="dark.css"]').forEach(link => link.media = (adminerDark ? '' : 'never'));
+                qs('meta[name="color-scheme"]').content = (adminerDark ? 'dark' : 'light');
+                cookie('adminer_dark=' + (adminerDark ? 1 : 0), 30);
+                document.querySelector('html').setAttribute('data-dark-mode', +adminerDark);
+            }
+        </script>
+		<?php
+	}
+
+	public function print_pexlechris_adminer_ui_customizations_style()
+	{
+		?>
+        <style>
+            html:not([data-dark-mode="1"]) a,
+            html:not([data-dark-mode="1"]) a:visited{
+                color: #0051cc;
+            }
+
+
+            #tables a.select {
+                font-size: 0;
+                padding: 12px 13px 5px 13px;
+                background-size: 16px;
+                background-repeat: no-repeat;
+                background-position: center 0;
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path><path d="M7 8h10"></path><path d="M7 12h10"></path><path d="M7 16h10"></path></svg>');
+                margin-left: -8px;
+            }
+            html[data-dark-mode="1"] #tables a.select{
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path><path d="M7 8h10"></path><path d="M7 12h10"></path><path d="M7 16h10"></path></svg>');
+            }
+
+            #table thead tr td a[href$="&modify=1"] {
+                font-size: 0;
+                padding: 12px 13px 5px 13px;
+                margin-left: -6px;
+                background-size: 16px;
+                background-repeat: no-repeat;
+                background-position: center 0;
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path><path d="M16 5l3 3"></path></svg>');
+            }
+            html[data-dark-mode="1"] #table thead tr td a[href$="&modify=1"]{
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path><path d="M16 5l3 3"></path></svg>');
+            }
+
+            #table tbody tr td a.edit {
+                font-size: 0;
+                padding: 12px 11px 5px 11px;
+                background-size: 16px;
+                background-repeat: no-repeat;
+                background-position: center 0;
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>');
+            }
+            html[data-dark-mode="1"] #table tbody tr td a.edit{
+                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>');
+            }
+
+            #tables a.active + a{
+                font-weight: bold;
+            }
+
+        </style>
+		<?php
+	}
+
+
+	/**
+     * This private method contains required scripts for auto login.
+     *
+	 * @since 4.1.0
+	 * @return void
+	 */
+	private function print_pexlechris_adminer_required_script()
+	{
+		?>
+        <script nonce="<?php echo esc_attr( Adminer\get_nonce() )?>">
 
             // auto login
             window.addEventListener('load', function(){
@@ -80,50 +201,21 @@ class Pexlechris_Adminer extends Adminer\Adminer {
                 }
 
             });
-		</script>
+        </script>
 
-		<style>
-            /* UI Customizations - START */
-            a,
-            a:visited{
-                color: #0051cc;
-            }
+		<?php
+	}
 
-            #tables a.select {
-                font-size: 0;
-                padding: 12px 13px 5px 13px;
-                background-size: 16px;
-                background-repeat: no-repeat;
-                background-position: center 0;
-                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-article" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path><path d="M7 8h10"></path><path d="M7 12h10"></path><path d="M7 16h10"></path></svg>');
-                margin-left: -8px;
-            }
-
-            #table thead tr td a[href$="&modify=1"] {
-                font-size: 0;
-                padding: 12px 13px 5px 13px;
-                margin-left: -6px;
-                background-size: 16px;
-                background-repeat: no-repeat;
-                background-position: center 0;
-                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path><path d="M16 5l3 3"></path></svg>');
-            }
-
-            #table tbody tr td a.edit {
-                font-size: 0;
-                padding: 12px 11px 5px 11px;
-                background-size: 16px;
-                background-repeat: no-repeat;
-                background-position: center 0;
-                background-image: url('data:image/svg+xml;utf-8,<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"/><path d="M13.5 6.5l4 4"/></svg>');
-            }
-            #tables a.active + a{
-                font-weight: bold;
-            }
-            /* UI Customizations - END */
-
-
-
+	/**
+     * This private method contains required css rules.
+     *
+	 * @since 4.1.0
+	 * @return void
+	 */
+	private function print_pexlechris_adminer_required_style()
+	{
+		?>
+        <style>
             #lang,
             .pexle_loginForm *,
             .pexle_loginForm + p,
@@ -146,36 +238,42 @@ class Pexlechris_Adminer extends Adminer\Adminer {
             #menu > h1{
                 border-top: 0;
             }
-
-			<?php if( !defined('PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB') || true === PEXLECHRIS_ADMINER_HAVE_ACCESS_ONLY_IN_WP_DB ): ?>
-                #breadcrumb > a:nth-child(2){
-                    width: 17px;
-                    display: inline-block;
-                    margin-left: -14px;
-                    color: transparent;
-                    background: #eee;
-                    margin-right: -23px;
-                    pointer-events: none;
-                }
-                #dbs{
-                    display: none;
-                }
-                .footer > div > fieldset > div > p{
-                    width: 150px;
-                    color: transparent;
-                    display: inline-block;
-                    margin-top: -15px;
-                }
-                .footer > div > fieldset > div > p > *:not([name="copy"]){
-                    display: none;
-                }
-                .footer > div > fieldset > div > p > [name="copy"]{
-                    float: left;
-                    margin-top: -0.5px;
-                }
-			<?php endif; ?>
-
-		</style>
+        </style>
 		<?php
 	}
+
+	/**
+     * This private method contains required css rules, when DB_USER has only access in one DB.
+     *
+	 * @since 4.1.0
+	 * @return void
+	 */
+	private function print_only_one_db_style()
+	{
+		?>
+        <style>
+            #breadcrumb > a:nth-child(2){
+                width: 17px;
+                display: inline-block;
+                margin-left: -14px;
+                color: transparent;
+                margin-right: -23px;
+                pointer-events: none;
+            }
+            #dbs{
+                display: none;
+            }
+            .footer > div > fieldset > div > p{
+                width: 150px;
+                color: transparent;
+                display: inline-block;
+                margin-top: -15px;
+            }
+            .footer > div > fieldset > div > p > *:not([name="copy"]){
+                display: none;
+            }
+        </style>
+		<?php
+	}
+
 }

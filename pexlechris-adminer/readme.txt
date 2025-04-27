@@ -4,9 +4,9 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.0.4
-Stable tag: 4.0.4
-Adminer version: 5.2.0
+Version: 4.1.0
+Stable tag: 4.1.0
+Adminer version: 5.2.1
 Requires at least: 4.7.0
 Tested up to: 6.8
 Requires PHP: 7.0
@@ -155,6 +155,15 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+
+= 4.1.0 =
+* [New]: Updated Adminer to version 5.2.1. [See Adminer 5.2.1 Release Notes](https://github.com/vrana/adminer/releases/tag/v5.2.1)
+* [New]: Dark Mode Switcher introduced! Click the ☀ icon at the bottom right to toggle Dark Mode.
+* [Enhancement]: Contrast issues for icons and fonts in the default Dark Mode theme have been fixed.
+* [Enhancement]: Introduced new methods for better code organization and modularization.
+* [Removed]: The `pexlechris_adminer_head` object method has been removed.
+If you were using it to override styles and scripts, please use the `pexlechris_adminer_head` action hook instead to add your own CSS and JS.
+
 = 4.0.4 =
 * [Enhancement]: Better UI to help error reporting when Database login failed.
 * [Bug Fix]: Fix `No such file or directory` login error when DB_HOST has been defined with the default MySql/MariaDB port 3306.
