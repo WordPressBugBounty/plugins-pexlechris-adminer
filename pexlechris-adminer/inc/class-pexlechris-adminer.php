@@ -112,8 +112,8 @@ class Pexlechris_Adminer extends Adminer\Adminer
 	{
 		?>
         <style>
-            html:not([data-dark-mode="1"]) a,
-            html:not([data-dark-mode="1"]) a:visited{
+            html:not([data-dark-mode="1"]) a:not(.jush-custom),
+            html:not([data-dark-mode="1"]) a:not(.jush-custom):visited{
                 color: #0051cc;
             }
 
@@ -169,6 +169,7 @@ class Pexlechris_Adminer extends Adminer\Adminer
      * This private method contains required scripts for auto login.
      *
 	 * @since 4.1.0
+     * @since 4.1.1 make permanent checkbox checked.
 	 * @return void
 	 */
 	private function print_pexlechris_adminer_required_script()
@@ -197,6 +198,13 @@ class Pexlechris_Adminer extends Adminer\Adminer
                     document.querySelector('.pexle_loginForm').classList.add('pexle_hide_form');
 
                 }else{
+                    // permanent login
+                    const checkbox = document.querySelector('input[name="auth[permanent]"]');
+                    if (!checkbox.checked) {
+                        checkbox.checked = true;
+                    }
+
+                    // auto login
                     document.querySelector('.pexle_loginForm + p > input').click();
                 }
 

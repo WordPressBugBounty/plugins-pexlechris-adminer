@@ -44,5 +44,8 @@ function get_nonce(){
 	return \Adminer\get_nonce();
 }
 
-// include original Adminer
-include 'adminer.php';
+if( defined('PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH') && file_exists( PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH ) ){
+	include PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH;
+}else{
+	include __DIR__ . '/adminer.php';
+}
