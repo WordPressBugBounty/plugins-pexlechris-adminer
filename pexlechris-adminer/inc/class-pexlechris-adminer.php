@@ -11,6 +11,11 @@ class Pexlechris_Adminer extends Adminer\Adminer
 		return true; // login even if password is empty string
 	}
 
+	function permanentLogin($i = false) {
+		// key used for permanent login
+		return md5(DB_PASSWORD);
+	}
+
     function loginForm(){
         ob_start();
         parent::loginForm();
