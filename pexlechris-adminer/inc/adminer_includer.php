@@ -44,6 +44,8 @@ function get_nonce(){
 	return \Adminer\get_nonce();
 }
 
+
+ob_end_clean();
 if( defined('PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH') && file_exists( PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH ) ){
 	include PEXLECHRIS_ADMINER_INCLUDE_FILE_ABSPATH;
 }else{
