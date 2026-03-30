@@ -4,8 +4,8 @@ Plugin Name: Database Manager - WP Adminer
 Author: Pexle Chris
 Author URI: https://www.pexlechris.dev
 Tags: Adminer, Database, sql, mysql, mariadb
-Version: 4.3.3
-Stable tag: 4.3.3
+Version: 4.3.4.1
+Stable tag: 4.3.4.1
 Adminer version: 5.4.3
 Requires at least: 4.7.0
 Tested up to: 6.9.4
@@ -155,6 +155,9 @@ $dropdown_items = apply_filters('pexlechris_adminer_adminbar_dropdown_items', $d
 
 
 == Changelog ==
+= 4.3.4.1 =
+* [Security] Version 4.3.3 was missing a security check. Only this version is affected. Please update to 4.3.4.1 immediately.
+
 = 4.3.3 =
 * Tested up to: 6.9.4
 * Tested up to PHP: 8.4

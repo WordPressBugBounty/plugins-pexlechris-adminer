@@ -7,7 +7,11 @@
 * @license https://www.gnu.org/licenses/gpl-2.0.html GNU General Public License, version 2 (one or other)
 * @version 5.4.2
 */namespace
-Adminer;const
+Adminer;
+if ( ! defined( 'ABSPATH' ) ) {
+	die;
+}
+const
 VERSION="5.4.2";error_reporting(24575);set_error_handler(function($Dc,$Fc){return!!preg_match('~^Undefined (array key|offset|index)~',$Fc);},E_WARNING|E_NOTICE);$bd=!preg_match('~^(unsafe_raw)?$~',ini_get("filter.default"));if($bd||ini_get("filter.default_flags")){foreach(array('_GET','_POST','_COOKIE','_SERVER')as$X){$xj=filter_input_array(constant("INPUT$X"),FILTER_UNSAFE_RAW);if($xj)$$X=$xj;}}if(function_exists("mb_internal_encoding"))mb_internal_encoding("8bit");function
 connection($h=null){return($h?:Db::$instance);}function
 adminer(){return
